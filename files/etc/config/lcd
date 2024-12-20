@@ -1,0 +1,6 @@
+
+config lcd 'settings'
+	option orientation 'landscape'
+	option details 'full'
+	option worktime '30'
+	option screen_switch '10'

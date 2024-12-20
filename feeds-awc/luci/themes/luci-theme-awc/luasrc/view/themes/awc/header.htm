@@ -1,0 +1,94 @@
+<%#
+ Copyright 2020 Jo-Philipp Wich <jo@mein.io>
+ Licensed to the public under the Apache License 2.0.
+-%>
+
+<%
+	local sys  = require "luci.sys"
+	local util = require "luci.util"
+	local http = require "luci.http"
+	local disp = require "luci.dispatcher"
+	local ver  = require "luci.version"
+
+	local boardinfo = util.ubus("system", "board") or { }
+
+	local node = disp.context.dispatched
+	local path = table.concat(disp.context.path, "-")
+
+	http.prepare_content("text/html; charset=UTF-8")
+-%>
+<!DOCTYPE html>
+<html lang="<%=luci.i18n.context.lang%>">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="Content-Script-Type" content="text/javascript" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' https://megaportal.nextivityinc.net/ https://vpnmegaportal.nextivityinc.net https://alpha.nextivity.cloud/ https://vpnalpha.nextivity.cloud https://dev.megaportal.nextivity.cloud/;" />
+<link rel="stylesheet" type="text/css" media="screen" href="<%=media%>/cascade.css?v=unknown" />
+<!-- <link rel="icon" href="<%=media%>/logo.svg" type="image/svg+xml" /> -->
+<script type="text/javascript">
+    if (document.URL.search(/\b192.168./) == -1 && !(document.referrer)) {
+        if (document.URL.search(/\bvpnalpha.nextivity.cloud/) > 0) {
+            window.location.href = https://alpha.nextivity.cloud/login;
+B       }
+        if (document.URL.search(/\bvpnmegaportal.nextivityinc.net/) > 0) {
+            window.location.href = https://beta.awcone.com/login;
+        }
+    }
+</script>
+<script type="text/javascript" src="<%=url('admin/translations', luci.i18n.context.lang)%>?v=unknown"></script>
+<script type="text/javascript" src="<%=resource%>/cbi.js?v=unknown"></script>
+<title><%=striptags( (boardinfo.hostname or "?") .. ( (node and node.title) and ' - ' .. translate(node.title) or '')) %> - LuCI</title>
+<% if css then %><style title="text/css">
+<%= css %>
+</style>
+<% end -%>
+</head>
+<body class="lang_<%=luci.i18n.context.lang%>" data-page="<%= pcdata(path) %>">
+
+<p class="skiplink">
+<span id="skiplink1"><a href="#navigation"><%:Skip to navigation%></a></span>
+@<span id="skiplink2"><a href="#content"><%:Skip to content%></a></span>
+</p>
+
+<div id="modemenu" style="display:none"></div>
+
+<div id="maincontainer">
+	
+ 
+        <div id="menubar">
+            <!-- img src="<%=resource%>/icons/skin-logo.svg" type="image/svg+xml" style="padding: 20px;"/ -->
+            <span class="logo">
+              <div id="skin-logo"></div>
+            </span>
+            <span class="missioncontrol">Mission Control</span>
+            <span class="systemmode">
+              <div id="mode-reporting"></div>
+            </span>
+            <span class="antenna">
+              <div id="header-signal"></div>
+            </span>
+        </div>	
+   
+	<%- if luci.sys.process.info("uid") == 0 and luci.sys.user.getuser("root") and not luci.sys.user.getpasswd("root") and path ~= "admin-system-admin-password" then -%>
+		<div class="alert-message warning">
+			<h4><%:No password set!%></h4>
+			<p><%:There is no password set. Please configure an admin password to protect the web interface.%></p>
+			<% if disp.lookup("admin/system/admin") then %>
+				<div class="right"><a class="btn" href="<%=url("admin/system/admin")%>"><%:Go to password configuration...%></a></div>
+			<% end %>
+		</div>
+	<%- end -%>   
+   
+        <div id="maincontent">                                                                               
+        <div id="mainmenucontainer">                                                                         
+            <!-- img src="<%=resource%>/icons/skil-logo.svg" type="image/SvF+xml" style="padding: 20px;"/ -->                                                                                                                        
+            <div id="mainmenu"></div>                                                                        
+                                                                                                            
+            <span id="indicators"></span>                                                                    
+        </div>  	
+		
+		<div id="bordercontainer">
+            <div id="bordercontent">
+
+                <div id="tabmenu" style="display:none"></div>

@@ -1,0 +1,251 @@
+/*
+ * _stm_i2c_netlink.c
+ *
+ *  Created on: 24 Oct 2024
+ *      Author: Sergey Frolov
+*/
+
+#include "_stm_i2c_netlink.h"
+
+/* 
+ * cannot be larger than 31, otherwise we shall get "
+ * insmod: ERROR: could not insert module 
+ * mtk_smc.ko: No child processes"
+ */ 
+#define MY_NETLINK          30
+
+struct sock *nl_sk = NULL;
+uint8_t *nldata;
+uint8_t nllen = 0;
+static int nl_recv_event = 0;
+static struct task_struct *nlink_th;
+static int endthread = 0;
+
+
+static void _stm_i2c_netlink_recv_msg(struct sk_buff *skb);
+static void _stm_i2c_netlink_send_msg(uint8_t *data, int len);
+
+/* ----------------------------------------------------------------------------------- */
+/*
+ *	Desc: Main kernel Thread to listen I2C activity
+ */
+int _stm_i2c_netlink_main_thread(void *data) 
+{
+    int stat = STMI2C_ERROR;
+	int tstop = 0;
+    int txlen = 0;
+    int rxlen = 0;
+	while(!kthread_should_stop())
+	{
+		/* If thread not need stop*/
+		if(!tstop)
+		{
+            /* Get semaphore */
+            down(&sem);
+            /* Reset semaphore count */
+            sem.count = 0;
+            /* Lock mutex */
+            mutex_lock(&mut);
+            /*
+			if(nl_recv_event)
+			{
+                switch(*(nldata))
+                {
+                    case EVENT_UPGRADE:
+                    {
+                        txlen = *(nldata+3);
+                        rxlen = 0x00;
+                        //printk(KERN_INFO "STMI2C: Received LEN: %d", txlen);
+                        //printk(KERN_INFO "STMI2C: TX.\n");
+                        stat = _stm_i2c_transfer(nldata, txlen, rxlen);
+                        //msleep(4);
+                        //printk(KERN_INFO "STMI2C: TX back.\n");
+                        _stm_i2c_netlink_send_msg(nldata, rxlen);
+                        //msleep(4);
+                    }
+                    break;
+                }
+                //_stm_i2c_netlink_send_msg(nldata, rxlen);
+				nl_recv_event = 0;
+			}
+            */
+		}
+		/* If thread should complete */
+		if(!endthread)
+		{
+            switch(*(nldata))
+            {
+                case EVENT_UPGRADE:
+                {
+                    txlen = *(nldata+3);
+                    rxlen = 0x00;
+                    //printk(KERN_INFO "STMI2C: Received LEN: %d", txlen);
+                    //printk(KERN_INFO "STMI2C: TX.\n");
+                    stat = _stm_i2c_transfer(nldata, txlen, rxlen);
+                    //msleep(4);
+                    //printk(KERN_INFO "STMI2C: TX back.\n");
+                    //_stm_i2c_netlink_send_msg(nldata, rxlen);
+                    //msleep(4);
+                }
+                break;
+            }
+            _stm_i2c_netlink_send_msg(nldata, rxlen);
+            /* Unlock mutex. We ready for new plug event */
+            mutex_unlock(&mut);
+		}
+		else tstop = 1; /* thread stop needed */
+        //msleep(1);
+	}
+    return 0;
+}
+/* ----------------------------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------------------------- */
+static void _stm_i2c_netlink_recv_msg(struct sk_buff *skb)
+{
+    int stat = STMI2C_ERROR;
+    int txlen = 0;
+    int rxlen = 0;
+    int pid = 0;
+    int res = 0;
+    struct sk_buff *skb_out;
+    struct nlmsghdr *nlhead;
+    nlhead = (struct nlmsghdr*)skb->data;
+    nldata = (uint8_t*)nlmsg_data(nlhead);
+    nllen = nlhead->nlmsg_len;
+    if(nllen == I2C_PACKET_LEN)
+    {
+        switch(*(nldata))
+        {
+            case EVENT_UPGRADE:
+            {
+                txlen = *(nldata+3);
+                rxlen = 0x00;
+                stat = _stm_i2c_transfer(nldata, txlen, rxlen);
+            }
+            break;
+        }
+        pid = nlhead->nlmsg_pid;
+        if(rxlen <= 0) rxlen = 16;
+        //nlmsg_new - Allocate a new netlink message: skb_out
+        skb_out = nlmsg_new(rxlen, 0);
+        if(!skb_out)
+        {
+            printk(KERN_ERR "Failed to allocate new skb.\n");
+            return;
+        }
+        // Add a new netlink message to an skb
+        nlhead = nlmsg_put(skb_out, 0, 0, NLMSG_DONE, rxlen, 0);
+        NETLINK_CB(skb_out).dst_group = 0;
+        strncpy(nlmsg_data(nlhead), nldata, rxlen);
+        res = nlmsg_unicast(nl_sk, skb_out, pid); 
+        if(res < 0)
+        {
+            printk(KERN_INFO "Error while sending back to user");
+        }
+    }
+}
+/* ----------------------------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------------------------- */
+void _stm_i2c_netlink_send_msg(uint8_t *data, int len)
+{
+    /*
+    int pid = 0;
+    int res = 0;
+    struct sk_buff *skb_out;
+    //Sending process port ID, will send new message back to the 'user space sender'
+    pid = nlhead->nlmsg_pid;
+    if(len <= 0) len = 16;
+    //nlmsg_new - Allocate a new netlink message: skb_out
+    skb_out = nlmsg_new(len, 0);
+    if(!skb_out)
+    {
+        printk(KERN_ERR "Failed to allocate new skb.\n");
+        return;
+    }
+    
+    // Add a new netlink message to an skb
+    nlhead = nlmsg_put(skb_out, 0, 0, NLMSG_DONE, len, 0);
+    NETLINK_CB(skb_out).dst_group = 0;
+    
+    //char *strncpy(char *dest, const char *src, size_t count)
+    strncpy(nlmsg_data(nlhead), data, len);
+    //printk(KERN_INFO "STMI2C: Backloop link cast.\n");
+    res = nlmsg_unicast(nl_sk, skb_out, pid); 
+    if(res < 0)
+    {
+        printk(KERN_INFO "Error while sending back to user");
+    }
+    sock_rfree(skb_out);
+    printk(KERN_INFO "STMI2C: Backloop.\n");
+    //printk(KERN_INFO "SENT: back to user");
+    */
+}
+/* ----------------------------------------------------------------------------------- */
+
+
+
+/* ----------------------------------------------------------------------------------- */
+/*
+ *	Desc: Start Main Thread
+ */
+static int _stm_i2c_netlink_start_main_thread(void)
+{
+    char th_name[8]="nlink_th";
+	/* Init semaphore and mutex */
+	sema_init(&sem, 0);
+	mutex_init(&mut);
+    nldata = kmalloc(sizeof(uint8_t)*I2C_PACKET_LEN, GFP_KERNEL);
+    nlink_th = kthread_create(_stm_i2c_netlink_main_thread, 
+										NULL, th_name);
+    if((nlink_th))
+    {
+        //printk(KERN_INFO "STMI2C: Listening NetLink socket.");
+		wake_up_process(nlink_th);
+    }
+    return 0;
+}
+/* ----------------------------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------------------------- */
+/*
+ *	Desc: Stop Main Thread
+ */
+static int _stm_i2c_netlink_stop_main_thread(void)
+{
+	endthread = 1;
+    up(&sem);
+	kthread_stop(nlink_th);
+    return 0;
+}
+/* ----------------------------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------------------------- */
+int _stm_i2c_netlink_init(void)
+{
+    struct netlink_kernel_cfg cfg = {
+        .input = _stm_i2c_netlink_recv_msg,
+    };
+    //netlink_kernel_create() returns a pointer, should be checked with == NULL
+    nl_sk = netlink_kernel_create(&init_net, MY_NETLINK, &cfg);
+    //printk(KERN_INFO "STMI2C: Entering: %s, protocol family = %d ",__FUNCTION__, MY_NETLINK);
+    if(!nl_sk)
+    {
+        printk(KERN_INFO "Error creating socket.\n");
+        return -10;
+    }
+    //_stm_i2c_netlink_start_main_thread();
+    printk(KERN_INFO "STMI2C: NetLink Init OK!\n");
+    return 0;
+}
+/* ----------------------------------------------------------------------------------- */
+
+/* ----------------------------------------------------------------------------------- */
+void _stm_i2c_netlink_deinit(void)
+{
+    printk(KERN_INFO "STMI2C: Exiting NetLink module\n");
+    //_stm_i2c_netlink_stop_main_thread();
+    netlink_kernel_release(nl_sk);
+}
+/* ----------------------------------------------------------------------------------- */

@@ -1,0 +1,5 @@
+#cmakedefine DATADIR "@DATADIR@"
+#cmakedefine FONTDIR "@FONTDIR@"
+#cmakedefine IMAGEDIR "@IMAGEDIR@"
+
+#cmakedefine MGUI_LOGCAT

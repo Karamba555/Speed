@@ -1,0 +1,2 @@
+config awc_uuid 'uuid_params'      
+	option keep '1'

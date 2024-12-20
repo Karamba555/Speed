@@ -1,0 +1,1 @@
+CONFIG_RTDEV=y

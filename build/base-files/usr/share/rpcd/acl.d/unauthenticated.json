@@ -1,0 +1,26 @@
+{
+	"unauthenticated": {
+		"description": "Access controls for unauthenticated requests",
+		"read": {
+			"ubus": {
+				"session": [
+					"access",
+					"login"
+				],
+				"file": [
+                                        "read"
+                                ]
+			},
+			"file": {
+				"/etc/awc/software_updates" : [ "read" ],
+				"/etc/awc/config_updates"   : [ "read" ],
+				"/tmp/nextivity/modemstatus.json" : [ "read" ]
+			}
+		},
+		"write" : {
+			"file": {
+				"/sbin/wakeup-cloud.sh \"upgrade\"": [ "exec" ]
+			}
+		}
+	}
+}

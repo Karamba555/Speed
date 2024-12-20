@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="21px"
+   height="21px"
+   viewBox="0 0 21 21"
+   version="1.1"
+   id="svg12"
+   sodipodi:docname="connected-cir.svg"
+   inkscape:version="0.92.5 (2060ec1f9f, 2020-04-08)">
+  <metadata
+     id="metadata16">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="975"
+     inkscape:window-height="560"
+     id="namedview14"
+     showgrid="false"
+     inkscape:zoom="11.238095"
+     inkscape:cx="10.5"
+     inkscape:cy="10.5"
+     inkscape:window-x="1753"
+     inkscape:window-y="805"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg12" />
+  <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+  <title
+     id="title2">True Stroked Copy 10</title>
+  <desc
+     id="desc4">Created with Sketch.</desc>
+  <defs
+     id="defs6" />
+  <g
+     id="Page-1"
+     stroke="none"
+     stroke-width="1"
+     fill="none"
+     fill-rule="evenodd"
+     style="fill:#a7c15b;fill-opacity:1">
+    <g
+       id="Price-tables-#1"
+       transform="translate(-136.000000, -213.000000)"
+       fill="#B2B2B2"
+       style="fill:#a7c15b;fill-opacity:1">
+      <g
+         id="True-Stroked-Copy-10"
+         transform="translate(136.000000, 213.000000)"
+         style="fill:#a7c15b;fill-opacity:1">
+        <path
+           d="M5.02923077,11.305 C4.94307692,11.214 4.9,11.0775 4.9,10.9865 C4.9,10.8955 4.94307692,10.759 5.02923077,10.668 L5.63230769,10.031 C5.80461538,9.849 6.06307692,9.849 6.23538462,10.031 L6.27846154,10.0765 L8.64769231,12.761 C8.73384615,12.852 8.86307692,12.852 8.94923077,12.761 L14.7215385,6.4365 L14.7650462,6.4365 C14.9369231,6.2545 15.1958154,6.2545 15.3676923,6.4365 L15.9707692,7.0735 C16.1430769,7.2555 16.1430769,7.5285 15.9707692,7.7105 L9.07846154,15.2635 C8.99230769,15.3545 8.90615385,15.4 8.77692308,15.4 C8.64769231,15.4 8.56153846,15.3545 8.47538462,15.2635 L5.11538462,11.4415 L5.02923077,11.305 Z M18.9,10.5 C18.9,15.12 15.12,18.9 10.5,18.9 C5.859,18.9 2.1,15.12 2.1,10.5 C2.1,5.88 5.88,2.1 10.5,2.1 C15.12,2.1 18.9,5.88 18.9,10.5 L18.9,10.5 Z M10.5,0 C4.704,0 0,4.704 0,10.5 C0,16.296 4.704,21 10.5,21 C16.296,21 21,16.296 21,10.5 C21,4.704 16.296,0 10.5,0 Z"
+           id="True-Stroked"
+           style="fill:#a7c15b;fill-opacity:1" />
+      </g>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,21 @@
+#!/bin/sh
+. /sbin/config.sh
+
+# /etc/init.d/apparmor reload
+# insmod ralink_nvram.ko
+# nvram_daemon&
+
+echo 1 > /proc/sys/net/ipv4/ip_forward
+#echo 65535 > /proc/sys/net/ipv4/netfilter/ip_conntrack_max
+#echo 1200 > /proc/sys/net/ipv4/netfilter/ip_conntrack_tcp_timeout_established
+#echo 1 > /proc/sys/net/ipv4/conf/all/mc_forwarding
+#/sbin/sysctl_cmd 2>/dev/null 1>/dev/null &
+echo 2 > /proc/sys/vm/drop_caches
+echo "2" > /proc/sys/kernel/randomize_va_space
+echo 200 > /proc/sys/vm/vfs_cache_pressure
+# /etc/init.d/gpio start
+
+#ifconfig eth0 down; ip link set eth0 name eth2;
+mkdir -p /var/log
+init_system start&
+watchdog  -t 10 /dev/watchdog1&

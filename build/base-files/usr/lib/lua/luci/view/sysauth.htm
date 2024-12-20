@@ -1,0 +1,140 @@
+<%#
+ Copyright 2008 Steven Barth <steven@midlink.org>
+ Copyright 2008-2012 Jo-Philipp Wich <jow@openwrt.org>
+ Licensed to the public under the Apache License 2.0.
+-%>
+
+<%+header%>
+
+<form method="post" action="<%=pcdata(FULL_REQUEST_URI)%>">
+	<%- if fuser then %>
+		<div class="alert-message warning">
+			<p><%:Invalid username and/or password! Please try again.%> <%=try_message%></p>
+		</div>
+	<% end -%>
+
+	<div class="cbi-map">
+       <!-- <div id="bordercontainer"> -->
+
+            <div id="loginstatus">
+                <h2>Current Status</h2>
+                <hr style="border-top:3px solid black; margin-left: 1em; margin-right: 1em">
+
+                <table id="loginstatus-table">
+                    <tr>
+                        <th id="loginstatus-connect-text"></td>
+                        <th id="loginstatus-signal-text"></td>
+                        <th id="loginstatus-band-text"></td>
+                        <th id="loginstatus-apn-text"></td>
+                        <th id="loginstatus-wanip-text"></td>
+                        <th id="loginstatus-lanip-text"></td>
+                    </tr>
+                        
+                    <tr>
+                        <td id="loginstatus-connect-icon"></td>
+                        <td id="loginstatus-signal-icon"></td>
+                        <td id="loginstatus-band-icon"></td>
+                        <td id="loginstatus-apn-icon"></td>
+                        <td id="loginstatus-wanip-icon"></td>
+                        <td id="loginstatus-lanip-icon"></td>
+                    </tr>
+                    
+                    <tr>
+                        <td id="loginstatus-connect-aux"></td>
+                        <td id="loginstatus-signal-aux"></td>
+                        <td id="loginstatus-band-aux"></td>
+                        <td id="loginstatus-apn-aux"></td>
+                        <td id="loginstatus-wanip-aux"></td>
+                        <td id="loginstatus-lanip-aux"></td>
+                    </tr>
+                    
+                    <!-- Bottom spacer workaround -->
+                    <tr>
+                        <td><p></p></td>
+                    </tr>
+                    
+                </table>
+            </div>
+        
+<!--            <div id="bordercontent"> -->
+            
+             <!--   <h2 name="content"><%:Authorization Required%></h2> -->
+                <h2 name="content"><%:Log In%></h2>
+                
+                <hr style="border-top:3px solid black; margin-left: 1em; margin-right: 1em">
+                
+                <div id="loginspacer" style="margin-left: 2em; margin-right: 2em; margin-bottom: 0em">
+                
+                    <div class="cbi-map-descr">
+                        <%:Please enter your username and password.%>
+                    </div>
+                    <div class="cbi-section"><div class="cbi-section-node">
+                    <div class="cbi-value">
+                        <label class="cbi-value-title"><%:Username%></label>
+                        <div class="cbi-value-field">
+                            <input class="cbi-input-text" type="text" name="luci_username" value="admin" />
+                        </div>
+                    </div>
+                    <div class="cbi-value cbi-value-last">
+                        <label class="cbi-value-title"><%:Password%></label>
+                        <div class="cbi-value-field">
+                            <input class="cbi-input-text" type="password" name="luci_password" />
+                        </div>
+                    </div>
+                    </div>
+                    
+                </div>
+                
+                <div class="cbi-page-actions">
+                    <input type="submit" value="<%:Login%>" class="btn cbi-button cbi-button-apply" />
+                    <input type="reset" value="<%:Reset%>" class="btn cbi-button cbi-button-reset" />
+                </div>
+                
+                </div>
+
+                <hr style="border-top:1px solid white; margin-left: 1em; margin-right: 1em">
+            </div>
+		
+<!--		</div>
+		</div> -->
+	</div>
+
+
+</form>
+<script type="text/javascript">//<![CDATA[
+	var input = document.getElementsByName('luci_password')[0];
+	if (input)
+		input.focus();
+//]]></script>
+
+<script type="text/javascript" src="<%=resource%>/signal-strength.js"></script>
+<script type="text/javascript">L.require('login-status')</script>
+
+<%
+local uci  = require "luci.model.uci".cursor()
+local fs  = require "nixio.fs"
+local https_key = uci:get("uhttpd", "main", "key")
+local https_port = uci:get("uhttpd", "main", "listen_https")
+if type(https_port) == "table" then
+	https_port = https_port[1]
+end
+
+if https_port and fs.access(https_key) then
+	https_port = https_port:match("(%d+)$")
+%>
+
+<script type="text/javascript">//<![CDATA[
+	if (document.location.protocol != 'https:') {
+		var url = 'https://' + window.location.hostname + ':' + '<%=https_port%>' + window.location.pathname;
+		var img=new Image;
+		img.onload=function(){window.location = url};
+		img.src='https://' + window.location.hostname + ':' + '<%=https_port%>' + '<%=resource%>/icons/loading.gif?' + Math.random();
+		setTimeout(function(){
+			img.src=''
+		}, 5000);
+	}
+//]]></script>
+
+<% end %>
+
+<%+footer%>

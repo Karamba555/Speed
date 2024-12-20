@@ -1,0 +1,36 @@
+
+config interface 'loopback'
+	option device 'lo'
+	option proto 'static'
+	option ipaddr '127.0.0.1'
+	option netmask '255.0.0.0'
+
+config globals 'globals'
+	option ula_prefix 'fdca:cd5b:b5b2::/48'
+	option packet_steering '1'
+
+config interface 'lan'
+	option proto 'static'
+	option ipaddr '192.168.113.1'
+	option netmask '255.255.255.0'
+	option ip6assign '60'
+	option device 'br-lan'
+	option mtu '1342'
+
+config device
+   	option name 'br-lan'
+    	option type 'bridge'
+    	option ports 'lan1'
+
+config interface 'wan'
+    	option device 'wan'
+    	option proto 'dhcp'
+
+config interface 'wwan'
+	option apn 'firstnet-broadband'
+	option auth 'none'
+	option iptype 'ipv4v6'
+	option mtu '1342'
+	option metric '10'
+	option proto 'qmi'
+	option device '/dev/cdc-wdm0'

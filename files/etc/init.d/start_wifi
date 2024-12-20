@@ -1,0 +1,42 @@
+#!/bin/sh /etc/rc.common
+ 
+START=25
+STOP=15
+USE_PROCD=1
+EXEC=/sbin/wifi.sh
+
+debug(){                          
+    logger -t "START_WIFI" "$1"               
+}  
+ 
+start_service() {   
+
+    debug "Start service"
+ 
+#     is_mod=$(lsmod | grep ralink_nvram)
+#     if [ "$is_mod" == "" ]; then
+#         insmod ralink_nvram.ko
+#         # nvram_daemon&
+
+#         echo 1 > /proc/sys/net/ipv4/ip_forward
+#         echo 2 > /proc/sys/vm/drop_caches
+#         echo "2" > /proc/sys/kernel/randomize_va_space
+#         echo 200 > /proc/sys/vm/vfs_cache_pressure
+
+#         mkdir -p /var/log
+# #        wifi.sh 2>/dev/null
+#         #watchdog  -t 10 /dev/watchdog1 &
+#     fi 
+
+    # commands to launch application
+
+    procd_open_instance                   
+    procd_set_param command "$EXEC"
+    procd_set_param respawn 3600 5 0 # respawn if crash, with limits
+    procd_set_param pidfile /var/run/start_wifi.pid	
+    procd_close_instance   
+}                 
+  
+stop_service() {            
+    debug "Stop service"    
+}

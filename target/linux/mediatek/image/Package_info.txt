@@ -1,0 +1,6 @@
+Allow List:Disable;
+Allow SingleList:Disable;
+Latest Version:v1.1.1.18;
+Start Version:Disable;
+Start LTE Version:Disable;
+Check Interval:24;

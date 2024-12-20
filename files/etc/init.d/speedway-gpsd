@@ -1,0 +1,113 @@
+#!/bin/sh /etc/rc.common
+
+START=90
+STOP=20
+USE_PROCD=1
+
+prog=/usr/bin/speedway-gpsd
+
+
+service_triggers()
+{
+    procd_add_reload_trigger "speedway_gpsd"
+}
+
+
+start_service() {
+    debug "Starting speedway-gpsd"
+    config_load speedway_gpsd
+
+    local enabled
+    local period
+
+    # Server setting default
+
+    if ! uci show speedway_gpsd.server 2>/dev/null ; then
+      uci set speedway_gpsd.server=server
+    fi
+
+    # Internal reporting
+
+    if ! uci show speedway_gpsd.internal 2>/dev/null ; then
+      uci set speedway_gpsd.internal=internal
+      uci set speedway_gpsd.internal.format=nmea
+    fi
+
+    dev=/dev/ttyS1
+    
+    num=0
+    arg=""
+    
+    serverPort=$(uci get speedway_gpsd.server.serverPort 2>/dev/null || true)
+    
+    if [ -n "$serverPort" ] ; then
+      serverAddr=$(uci get network.lan.ipaddr)
+      arg="$arg -sa ${serverAddr} -sp ${serverPort}"
+    fi
+      
+    internalFormat=$(uci get speedway_gpsd.internal.format 2>/dev/null || true)
+      
+    if [ "$internalFormat" == "nmea" -o "$internalFormat" == "taip" ] ; then
+      internalRate=$(uci get speedway_gpsd.internal.rate 2>/dev/null || true)
+      internalTid=$(uci get speedway_gpsd.internal.tid 2>/dev/null || true)
+      
+      arg="$arg -h ,,,internal,$internalFormat,$internalRate,$internalTid"
+    fi
+      
+    while true; do     
+      client=$(uci get speedway_gpsd.@gpsd[$num].client 2>/dev/null || true)
+      if [ -z "$client" ] ; then break; fi
+
+      port=$(uci get speedway_gpsd.@gpsd[$num].port 2>/dev/null || true)
+      if [ -z "$port" ] ; then break; fi
+
+      tcp=$(uci get speedway_gpsd.@gpsd[$num].tcp 2>/dev/null || true)
+      
+      if [ "$tcp" == "true" ] ; then 
+        tcp="tcp"
+      elif [ "$tcp" == "false" ] ; then
+        tcp="udp"
+      else
+        break
+      fi
+      
+      format=$(uci get speedway_gpsd.@gpsd[$num].format 2>/dev/null || true)
+      if [ -z "$format" ] ; then break; fi
+      
+      rate=$(uci get speedway_gpsd.@gpsd[$num].rate 2>/dev/null || true)
+      tid=$(uci get speedway_gpsd.@gpsd[$num].tid 2>/dev/null || true)
+      
+      instance="$client,$port,$tcp,$format"
+      
+      if [ -n "$rate" ] ; then
+        instance="$instance,$rate"
+        
+        if [ -n "$tid" ] ; then
+          instance="$instance,$tid"
+        fi
+      fi
+      
+      arg="$arg -h $instance"
+      
+      num=$(($num + 1))
+      
+    done
+      
+    if [ -z "$arg" ] ; then 
+      return
+    fi
+      
+    arg="-d ${dev}${arg}"
+
+    echo "speedway-gpsd arguments: ${arg}"
+
+    procd_open_instance
+    procd_set_param command $prog $arg
+    procd_set_param respawn
+    procd_close_instance
+}
+
+stop_service() {
+  debug "Stop service"
+}
+

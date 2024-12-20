@@ -1,0 +1,21 @@
+#!/bin/sh
+
+if [ "$DEVICE" == "wwan0" ]; then
+		if [ "$ACTION" == "ifup" -o "$ACTION" == "ifupdate" ]; then
+		    logger -t hotplag_iface "$DEVICE: $ACTION"
+		    if [ "$ACTION" == "ifup" ]; then
+				mode=$(uci get awc.main.bridge_mode 2>/dev/null || true)
+				if [ "$mode" == "on" ]; then
+					WIP=$(/sbin/ifconfig wwan0 | grep "inet addr" | awk {'print $2'} | awk -F ":" {'print $2'})
+					logger -t hotplug_iface "WIP: $WIP"
+					#/sbin/passthrough.sh
+				fi
+		    fi
+		elif [ "$ACTION" == "ifdown" ]; then
+		    logger -t hotplug_iface "$ACTION"
+		fi
+elif [ "$DEVICE" == "br-lan" ]; then
+	if [ "$ACTION" == "ifup" -o "$ACTION" == "ifupdate" ]; then
+	    logger -t hotplug_iface "$DEVICE: $ACTION"
+	fi
+fi

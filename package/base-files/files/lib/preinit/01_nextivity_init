@@ -1,0 +1,30 @@
+nextivity_init() {
+    # Get serial number
+    mkdir -p /tmp/nextivity/
+    mtd=$(grep -i \"manufacture\" /proc/mtd | cut -d : -f 1 || true)
+
+    # When Atel can provide the correct mtd values we should use 'serialNumber' field instead of 'AtelHWID'
+    serialNumber=$(cat /dev/${mtd} | grep serialNumber)
+    serialNumberFld=${serialNumber:13:12}
+    if [ -z "$serialNumberFld" ] ; then
+        # If this unit does not have the serialNumber field defined then derive the Serial number from the AtelHWID
+        serialNumberFld=$(cat /dev/${mtd} | grep AtelHWID | md5sum | cut -b  0-15)
+    fi
+    echo -n $serialNumberFld > /tmp/nextivity/serialNumber
+
+    # When Atel can provide the correct mtd values we should use 'WanAddress' for wifi 0 MAC
+    wifi0MAC=$(cat /dev/${mtd} | grep WlanAddress= )
+    wifi0MACFld=${wifi0MAC:11:12}
+    wifi0MACcorr=""
+    if [ ! -z "$wifi0MACFld" ] ; then
+        wifi0MACcorr=${wifi0MACFld:0:2}":"${wifi0MACFld:2:2}":"${wifi0MACFld:4:2}":"${wifi0MACFld:6:2}":"${wifi0MACFld:8:2}":"${wifi0MACFld:10:2}
+        wifi1MACFld=$(printf %X $((0x$wifi0MACFld + 1)))
+        wifi1MACcorr=${wifi1MACFld:0:2}":"${wifi1MACFld:2:2}":"${wifi1MACFld:4:2}":"${wifi1MACFld:6:2}":"${wifi1MACFld:8:2}":"${wifi1MACFld:10:2}
+    fi
+
+    echo "default_radio0=${wifi0MACcorr}" > /tmp/nextivity/wifimac
+    echo "default_radio1=${wifi1MACcorr}" >> /tmp/nextivity/wifimac
+
+}
+
+boot_hook_add preinit_main nextivity_init

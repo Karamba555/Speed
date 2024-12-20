@@ -1,0 +1,14 @@
+#!/bin/sh
+
+if [ "$PKG_UPGRADE" != 1 ]; then
+	uci get luci.themes.Nextivity >/dev/null 2>&1 || \
+	uci batch <<-EOF
+		set luci.themes.Nextivity=/luci-static/awc
+		set luci.main.mediaurlbase=/luci-static/awc
+		commit luci
+	EOF
+fi
+
+prefix=/www/luci-static/resources/view/status/include
+
+exit 0

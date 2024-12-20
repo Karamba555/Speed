@@ -1,0 +1,21 @@
+#CFLAGS+=-I$(TOPDIR)/lib/include #valid
+LIBS+=-lcrypto -lpthread
+
+LIBNVRAM=libnvram.a
+LIBNVRAM_SHARED=libnvram.so
+LIBNVRAM_SHARED_FULLNAME=libnvram-0.9.28.so
+
+CFLAGS+=-DUSE_HOSTCC
+LDFLAGS+= -shared -fPIC
+
+#all:	$(LIBNVRAM) $(LIBNVRAM_SHARED_FULLNAME) 
+
+$(LIBNVRAM_SHARED_FULLNAME): $(OBJSC)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(LIBS) -o $@ $^
+
+$(LIBNVRAM) ar-target: $(OBJS)
+	$(AR) $(ARFLAGS) $(LIBNVRAM) $(OBJS)
+
+clean:
+	$(RM) $(LIBNVRAM_SHARED)* $(LIBNVRAM_SHARED_FULLNAME)*
+

@@ -1,0 +1,2 @@
+#!/bin/sh
+serial_tool -d$1

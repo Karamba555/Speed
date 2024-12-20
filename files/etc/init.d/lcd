@@ -1,0 +1,32 @@
+#!/bin/sh /etc/rc.common
+
+START=25
+STOP=15
+USE_PROCD=1
+EXEC=/usr/bin/mgui
+
+debug(){
+    logger -t "LCD" "$1"
+}
+
+service_triggers()
+{
+    procd_add_reload_trigger "lcd"
+}
+ 
+start_service() {
+
+    debug "Start service"
+    config_load lcd
+
+    # commands to launch application
+
+    procd_open_instance
+    procd_set_param command "$EXEC"
+    procd_set_param pidfile /var/run/lcd.pid
+    procd_close_instance
+}
+ 
+stop_service() {
+    debug "Stop service"
+}

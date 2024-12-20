@@ -1,0 +1,10 @@
+config awc_cloud 'cloud'
+    option poll_host       ei.awcone.com
+    option delay           100
+    option action_poll     60
+    option action_sequence 0
+    option auto_firmware   on
+    option auto_config     on
+    option eula            no
+    option config_report   no
+
