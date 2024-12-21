@@ -36,6 +36,7 @@ phases:
   build:
     commands:
       - apt update && apt -y dist-upgrade
+      - apt-get install gcc binutils bzip2 flex python3 perl make grep unzip gawk subversion libz-dev libc-dev rsync pip unzip libncurses5-dev libncursesw5-dev git swig
       - make dirclean
       - make clean
       - ./scripts/feeds update -a
