@@ -1,16 +1,15 @@
-FROM python:3.12
-WORKDIR /usr/local/app
-
-# Install the application dependencies
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-
+FROM ubuntu:latest
+WORKDIR /usr/local/speedway
 # Copy in the source code
-COPY src ./src
-EXPOSE 5000
+COPY . .
+# Install the application dependencies
+RUN apt update && apt -y dist-upgrade && apt -y install gcc \
+    binutils bzip2 flex python3 perl make grep unzip \
+    gawk subversion libz-dev libc-dev rsync pip \
+    libncurses5-dev libncursesw5-dev git swig 
+RUN make dirclean && make clean && ./scripts/feeds update -a \
+    && ./scripts/feeds install -a && git restore .config \
+    && make -j2
 
-# Setup an app user so the container doesn't run as the root user
-RUN useradd app
-USER app
+EXPOSE 3000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
