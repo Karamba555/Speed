@@ -2,6 +2,7 @@ FROM ubuntu:latest
 WORKDIR /usr/src/speedway
 # Copy in the source code
 COPY . .
+RUN sudo chmod +x /usr/src/speedway
 # Install the application dependencies
 RUN apt update && apt -y dist-upgrade && apt -y install gcc \
     binutils bzip2 flex python3 perl make grep unzip \
