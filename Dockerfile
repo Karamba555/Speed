@@ -1,5 +1,7 @@
 FROM ubuntu:latest
 WORKDIR /usr/src/speedway
+VOLUME /var/lib/docker
+
 # Copy in the source code
 COPY . .
 RUN chmod +x /usr/src/speedway
