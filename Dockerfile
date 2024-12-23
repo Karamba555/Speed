@@ -1,5 +1,5 @@
 FROM ubuntu:latest
-WORKDIR /usr/local/speedway
+WORKDIR /speedway
 # Copy in the source code
 COPY . .
 # Install the application dependencies
