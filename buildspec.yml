@@ -12,9 +12,10 @@ phases:
       - echo log in to Amazon ECR...
       - aws --version
       - echo $AWS_DEFAULT_REGION
-     # - aws ecr get-login --no-include-email --region us-east-1
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 361769595990.dkr.ecr.us-east-1.amazonaws.com/speedway
+      - aws ecr get-login --no-include-email --region us-east-1
       - REPOSITORY_URI=361769595990.dkr.ecr.us-east-1.amazonaws.com/speedway
+     # - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 361769595990.dkr.ecr.us-east-1.amazonaws.com/speedway
+     # - REPOSITORY_URI=361769595990.dkr.ecr.us-east-1.amazonaws.com/speedway
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH:=latest}
   build:
