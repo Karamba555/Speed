@@ -11,7 +11,7 @@ RUN  make clean &&
 RUN sudo ./scripts/feeds update -a 
 RUN sudo ./scripts/feeds install -a 
 RUN git restore .config 
-RUN sudo make -j2
+RUN make -j2
 
 
 EXPOSE 3000
