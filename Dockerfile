@@ -1,11 +1,10 @@
 FROM ubuntu:latest
 WORKDIR /usr/src/speedway
-VOLUME /var/lib/docker
-
 # Copy in the source code
 COPY . .
-RUN chmod +x /usr/src/speedway
+RUN chmod 755 /usr/src/speedway/scripts
 # Install the application dependencies
+RUN wget google.com
 RUN apt update && apt -y dist-upgrade && apt -y install gcc \
     binutils bzip2 flex python3 perl make grep unzip \
     gawk subversion libz-dev libc-dev rsync pip \
