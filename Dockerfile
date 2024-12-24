@@ -1,8 +1,8 @@
 FROM ubuntu:latest
-WORKDIR /usr/src/speedway
+WORKDIR /home/speedway
+RUN chmod -R 777 /home/speedway
 # Copy in the source code
 COPY . .
-RUN ["chmod", "+x", "/usr/src/speedway/scripts"] 
 # Install the application dependencies
 RUN apt update && apt -y dist-upgrade && apt -y install gcc \
     binutils bzip2 flex python3 perl make grep unzip \
