@@ -7,7 +7,7 @@ RUN apt update && apt -y dist-upgrade && apt -y install gcc \
     binutils bzip2 flex python3 perl make grep unzip \
     gawk subversion libz-dev libc-dev rsync pip sudo \
     libncurses5-dev libncursesw5-dev git swig wget file
-RUN  make clean 
+#RUN  make clean 
 RUN  ./scripts/feeds update -a 
 RUN  ./scripts/feeds install -a 
 RUN git restore .config 
